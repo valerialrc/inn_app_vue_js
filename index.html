@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pousadaria</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="inn-app">
+    <h1>Pousadaria</h1>
+
+    <input class="input" type="text" v-model="searchText" placeholder="Buscar Pousada">
+
+    <div class="msg" v-if="listResult.length <= 0">
+      Nenhuma pousada encontrada!
+    </div>
+
+    <div v-if="selectedInnId == null && selectedRoomId == null">
+      <ul>
+        <li v-for="item, index in listResult">
+          <div class="card">
+            <p><a href="#" @click.prevent="showInnDetails(item.id)"> {{ item.trade_name }}</a></p>
+            <p>Descrição: {{ item.description }}</p>
+            <p>Ativo: {{ item.active ? 'Sim' : 'Não' }}</p>
+            <p>Avaliação Média: {{ item.average_rating }}</p>
+            <p>Telefone: {{ item.phone }}</p>
+            <p>Email: {{ item.email }}</p>
+            <p>Endereço: {{ item.address_street }}, {{ item.address_number }} - {{ item.address_district }}, {{ item.address_city }}, {{ item.address_state }}, {{ item.address_cep }}</p>
+          </div>
+        </li>
+      </ul>
+    </div>
+
+    <div v-if="selectedInnId !== null && selectedRoomId == null">
+      <h2>Detalhes da Pousada</h2>
+
+      <div>
+        <button class="button" @click="resetDetails">Voltar</button>
+      </div>
+
+      <div class="card">
+        <p><strong>{{ trade_name }}</strong></p>
+        <p>Descrição: {{ description }}</p>
+        <p>Aceita Animais de Estimação: {{ accepts_pets ? 'Sim' : 'Não' }}</p>
+        <p>Horário de Check-in: {{ new Date(checkin_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}</p>
+        <p>Horário de Check-out: {{ new Date(checkout_time).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) }}</p>
+        <p>Políticas: {{ policies }}</p>
+        <p>Ativo: {{ active ? 'Sim' : 'Não' }}</p>
+        <p>Avaliação Média: {{ average_rating }}</p>
+        <p>Telefone: {{ phone }}</p>
+        <p>Email: {{ email }}</p>
+        <p>Endereço: {{ address_street }}, {{ address_number }} - {{ address_district }}, {{ address_city }}, {{ address_state }}, {{ address_cep }}</p>
+      </div>
+
+      <div v-if="listRooms.length <= 0">
+        Nenhum quarto encontrado!
+      </div>
+
+      <div v-if="listRooms.length > 0">
+        <h3>Quartos Disponíveis</h3>
+        <div v-if="selectedRoomId == null">
+          <ul>
+            <li v-for="room in listRooms" :key="room.id">
+              <div class="card">
+                <p><a href="#" @click.prevent="showRoomDetails(room.id)"> {{ room.name }}</a></p>
+                <p>Descrição: {{ room.description }}</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div v-if="selectedRoomId !== null">
+      <div>
+        <button class="button" @click="resetRoomDetails">Voltar</button>
+      </div>
+
+      <div class="card">
+        <p><strong>{{ roomData.name }}</strong></p>
+        <p>Descrição: {{ roomData.description }}</p>
+        <p>Dimensão: {{ roomData.dimension }} m²</p>
+        <p>Ocupação Máxima: {{ roomData.max_occupancy }} pessoas</p>
+        <p>Diária: R$ {{ roomData.daily_rate }}</p>
+        <p>Banheiro: {{ roomData.has_bathroom ? 'Sim' : 'Não' }}</p>
+        <p>Varanda: {{ roomData.has_balcony ? 'Sim' : 'Não' }}</p>
+        <p>Ar Condicionado: {{ roomData.has_air_conditioning ? 'Sim' : 'Não' }}</p>
+        <p>TV: {{ roomData.has_tv ? 'Sim' : 'Não' }}</p>
+        <p>Guarda-Roupa: {{ roomData.has_wardrobe ? 'Sim' : 'Não' }}</p>
+        <p>Cofre: {{ roomData.has_safe ? 'Sim' : 'Não' }}</p>
+        <p>Acessível: {{ roomData.is_accessible ? 'Sim' : 'Não' }}</p>
+        <p>Disponível: {{ roomData.is_available ? 'Sim' : 'Não' }}</p>
+      </div>
+
+      <h1>Consulta de Disponibilidade</h1>
+
+      <label for="checkinDate">Data de Check-in:</label>
+      <input type="date" v-model="checkinDate">
+
+      <label for="checkoutDate">Data de Check-out:</label>
+      <input type="date" v-model="checkoutDate">
+
+      <label for="guestsNumber">Número de Hóspedes:</label>
+      <input type="number" v-model="guestsNumber">
+
+      <div>
+        <button class="button" @click="checkAvailability">Verificar Disponibilidade</button>
+      </div>
+
+      <div v-if="availabilityMessage">
+        <p>{{ availabilityMessage }}</p>
+        <p><strong>Preço da Reserva:</strong> {{ reservationPrice }}</p>
+      </div>
+
+      <div v-if="error">
+        <p>{{ error }}</p>
+
+      </div>
+
+    </div>
+  </div>
+
+  <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+  <script src="main.js"></script>
+</body>
+</html>
