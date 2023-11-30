@@ -205,7 +205,7 @@ const app = Vue.createApp({
     resetCheckAvailability() {
       this.checkinDate = null;
       this.checkoutDate = null;
-      this.guestsNumber = null;
+      this.guestsNumber = 1;
       this.availabilityMessage = null;
       this.reservationPrice = null;
       this.error = null;
@@ -224,8 +224,6 @@ const app = Vue.createApp({
   
         this.listCities.push(city);
       });
-
-      console.log(this.listCities)
     },
   
     async getInnsByCity(cityId) {
@@ -277,6 +275,16 @@ const app = Vue.createApp({
       this.selectedCityId = null;
       this.selectedCityName = '';
       this.listInnsByCity = [];
+    },
+
+    toCurrency(price) {
+      if (!isNaN(price)) {
+        const formatted_price = parseFloat(price).toFixed(2);
+        
+        return formatted_price.replace('.', ',');
+      } else {
+        return price;
+      }
     }
   }
 })

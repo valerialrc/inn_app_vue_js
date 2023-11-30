@@ -131,7 +131,7 @@
         <p>TV: {{ roomData.has_tv ? 'Sim' : 'Não' }}</p>
         <p>Guarda-Roupa: {{ roomData.has_wardrobe ? 'Sim' : 'Não' }}</p>
         <p>Cofre: {{ roomData.has_safe ? 'Sim' : 'Não' }}</p>
-        <p>Acessível: {{ roomData.is_accessible ? 'Sim' : 'Não' }}</p>
+        <p>Acessível para pessoas com defiência: {{ roomData.is_accessible ? 'Sim' : 'Não' }}</p>
         <p>Disponível: {{ roomData.is_available ? 'Sim' : 'Não' }}</p>
       </div>
 
@@ -144,7 +144,7 @@
       <input type="date" v-model="checkoutDate">
 
       <label for="guestsNumber">Número de Hóspedes:</label>
-      <input type="number" v-model="guestsNumber">
+      <input type="number" v-model="guestsNumber" :value="guestsNumber">
 
       <div>
         <button class="button" @click="checkAvailability">Verificar Disponibilidade</button>
@@ -152,12 +152,14 @@
 
       <div v-if="availabilityMessage">
         <p>{{ availabilityMessage }}</p>
-        <p><strong>Preço da Reserva:</strong> {{ reservationPrice }}</p>
+        <p><strong>Preço da Reserva:</strong> R${{ toCurrency(reservationPrice) }}</p>
       </div>
 
       <div v-if="error">
         <p>{{ error }}</p>
       </div>
+
+      <br>
     </div>
   </div>
 
