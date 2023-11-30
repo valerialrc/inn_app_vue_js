@@ -16,7 +16,49 @@
       Nenhuma pousada encontrada!
     </div>
 
-    <div v-if="selectedInnId == null && selectedRoomId == null">
+    <div v-if="selectedInnId == null && selectedRoomId == null && selectedCityId == null && searchText == ''">
+      <div>
+        <h2>Lista de Cidades</h2>
+        <ul>
+          <li class="city"v-for="city in listCities" :key="city.id">
+            <div >
+              <p><a href="#" @click.prevent="showInnsByCity(city.id)">{{ city.name }}</a></p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div v-if="selectedInnId == null && selectedRoomId == null && selectedCityId !== null">
+      <div>
+        <button class="button" @click="resetCityDetails">Voltar</button>
+      </div>
+
+      <div v-if="listInnsByCity.length <= 0">
+        Nenhuma pousada encontrada!
+      </div>
+
+      <div v-if="listInnsByCity.length > 0">
+        <h3>Pousadas em {{selectedCityName}}</h3>
+
+        <ul>
+          <li v-for="item, index in listInnsByCity">
+            <div class="card">
+              <p><a href="#" @click.prevent="showInnDetails(item.id)"> {{ item.trade_name }}</a></p>
+              <p>Descrição: {{ item.description }}</p>
+              <p>Ativo: {{ item.active ? 'Sim' : 'Não' }}</p>
+              <p>Avaliação Média: {{ item.average_rating }}</p>
+              <p>Telefone: {{ item.phone }}</p>
+              <p>Email: {{ item.email }}</p>
+              <p>Endereço: {{ item.address_street }}, {{ item.address_number }} - {{ item.address_district }}, {{ item.address_city }}, {{ item.address_state }}, {{ item.address_cep }}</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div v-if="selectedInnId == null && selectedRoomId == null && selectedCityId === null">
+      <h2>Lista de Pousadas</h2>
       <ul>
         <li v-for="item, index in listResult">
           <div class="card">
@@ -115,9 +157,7 @@
 
       <div v-if="error">
         <p>{{ error }}</p>
-
       </div>
-
     </div>
   </div>
 

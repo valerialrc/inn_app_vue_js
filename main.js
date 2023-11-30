@@ -4,6 +4,8 @@ const app = Vue.createApp({
       searchText: '',
       selectedInnId: null,
       selectedRoomId: null,
+      selectedCityId: null,
+      selectedCityName: '',
       id: '',
       user_id: '',
       trade_name: '',
@@ -33,6 +35,8 @@ const app = Vue.createApp({
       checkoutDate: '',
       guestsNumber: 1,
       error: null,
+      listCities: [],
+      listInnsByCity: [], 
     }
   },
 
@@ -41,11 +45,13 @@ const app = Vue.createApp({
       this.resetDetails();
       this.resetRoomDetails();
       this.resetCheckAvailability();
+      this.resetCityDetails();
 
       if (this.searchText) {
         return this.listInns.filter(inn => {
           return inn.trade_name.toLowerCase().includes(this.searchText.toLowerCase());
         });
+
       } else {
         return this.listInns;
       }
@@ -53,6 +59,7 @@ const app = Vue.createApp({
   },
   
   async mounted() {
+    await this.getCities();
     await this.getData();
   },
 
@@ -94,15 +101,6 @@ const app = Vue.createApp({
     
     },
 
-    async getRoomsData() {
-      if (this.selectedInnId !== null) {
-        let response = await fetch(`http://localhost:3000/api/v1/inns/${this.selectedInnId}/rooms`);
-
-        this.listRooms = await response.json();
-        this.roomData = this.listRooms;
-      }
-    },
-
     async showInnDetails(id){
       this.selectedInnId = id;
       let response = await fetch(`http://localhost:3000/api/v1/inns/${id}`);
@@ -133,16 +131,6 @@ const app = Vue.createApp({
       this.address_cep = data.address.cep;
         
       await this.getRoomsData();
-    },
-
-    async showRoomDetails(roomId) {
-      this.selectedRoomId = roomId;
-
-      let response = await fetch(`http://localhost:3000/api/v1/inns/${this.selectedInnId}/rooms/${this.selectedRoomId}`);
-    
-      let roomData = await response.json();
-
-      this.roomData = roomData
     },
 
     resetDetails() {
@@ -176,19 +164,29 @@ const app = Vue.createApp({
       this.listRooms = [];
     },
 
+    async getRoomsData() {
+      if (this.selectedInnId !== null) {
+        let response = await fetch(`http://localhost:3000/api/v1/inns/${this.selectedInnId}/rooms`);
+
+        this.listRooms = await response.json();
+        this.roomData = this.listRooms;
+      }
+    },
+
+    async showRoomDetails(roomId) {
+      this.selectedRoomId = roomId;
+
+      let response = await fetch(`http://localhost:3000/api/v1/inns/${this.selectedInnId}/rooms/${this.selectedRoomId}`);
+    
+      let roomData = await response.json();
+
+      this.roomData = roomData
+    },
+
     resetRoomDetails() {
       this.selectedRoomId = null;
 
       this.roomData = null;
-    },
-
-    resetCheckAvailability() {
-      this.checkinDate = null;
-      this.checkoutDate = null;
-      this.guestsNumber = null;
-      this.availabilityMessage = null;
-      this.reservationPrice = null;
-      this.error = null;
     },
 
     async checkAvailability() {
@@ -203,6 +201,83 @@ const app = Vue.createApp({
       this.reservationPrice = data.reservation_price;
       this.error = data.error;
     },
+
+    resetCheckAvailability() {
+      this.checkinDate = null;
+      this.checkoutDate = null;
+      this.guestsNumber = null;
+      this.availabilityMessage = null;
+      this.reservationPrice = null;
+      this.error = null;
+    },
+
+    async getCities() {
+      let response = await fetch('http://localhost:3000/api/v1/cities');
+      let data = await response.json();
+
+      this.listCities = [];
+
+      data.forEach(item => {
+        var city = new Object();
+        city.id = item.id;
+        city.name = item.name;
+  
+        this.listCities.push(city);
+      });
+
+      console.log(this.listCities)
+    },
+  
+    async getInnsByCity(cityId) {
+      let response = await fetch(`http://localhost:3000/api/v1/cities/${cityId}`);
+      let data = await response.json();
+
+      this.listInnsByCity = [];
+
+      data.forEach(item => {
+        var inn = new Object();
+        inn.id = item.id;
+        inn.user_id = item.user_id;
+        inn.trade_name = item.trade_name;
+        inn.phone = item.phone;
+        inn.email = item.email;
+        inn.description = item.description;
+        inn.payment_method_id = item.payment_method_id;
+        inn.accepts_pets = item.accepts_pets;
+        inn.checkin_time = item.checkin_time;
+        inn.checkout_time = item.checkout_time;
+        inn.policies = item.policies;
+        inn.active = item.active;
+        inn.average_rating = item.average_rating;
+    
+        // Address
+        inn.address_id = item.address.id;
+        inn.address_street = item.address.street;
+        inn.address_number = item.address.number;
+        inn.address_district = item.address.district;
+        inn.address_state = item.address.state;
+        inn.address_city = item.address.city;
+        inn.address_cep = item.address.cep;
+    
+        this.listInnsByCity.push(inn);
+      });
+      console.log(this.selectedCityId)
+
+    },
+  
+    async showInnsByCity(cityId) {
+      this.selectedCityId = cityId;
+      const selectedCity = this.listCities.find(city => city.id === cityId);
+      this.selectedCityName = selectedCity ? selectedCity.name : '';
+      
+      await this.getInnsByCity(cityId);
+    },
+
+    resetCityDetails() {
+      this.selectedCityId = null;
+      this.selectedCityName = '';
+      this.listInnsByCity = [];
+    }
   }
 })
 
